@@ -45,9 +45,8 @@ def write_daily_report(
 
 def _generate_ai_text(settings: Settings, prompt: str) -> tuple[str | None, str | None]:
     client = OllamaClient(settings)
-    if not client.is_available():
-        return None, "LLM 降级：未连接到本地 Ollama，仅保留规则版报告。"
     try:
+        client.check()
         guard = (
             f"{prompt}\n\n"
             "请只输出 3-5 条定性文字解读，不要输出表格。"

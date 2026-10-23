@@ -30,7 +30,17 @@ ollama list
 qwen3:4b
 ```
 
-## 安装
+## MacBook Air + Windows GPU 双机使用
+
+完整步骤见 [macOS 安装、SSH 隧道与自检](docs/mac_windows.md)。Mac 运行项目，Windows Ollama 仅监听回环地址，Mac 通过 SSH 本地端口 11435 访问；无需前端或 Mac 本机模型。
+
+```bash
+python -m stock_assistant --doctor
+```
+
+自检会验证模型列表和真实对话；无需 Tushare Token。失败退出 1，报告生成仍支持明确标注的规则降级。
+
+## Windows 单机安装
 
 ```powershell
 cd weektemp\stock-assistant
