@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -60,7 +61,7 @@ def load_settings(project_root: Path | None = None) -> Settings:
         a_share_dir=a_share_dir,
         reports_dir=reports_dir,
         tushare_token=os.getenv("TUSHARE_TOKEN", "").strip(),
-        ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/"),
+        ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").strip().rstrip("/"),
         ollama_model=os.getenv("OLLAMA_MODEL", "qwen3:4b").strip() or "qwen3:4b",
         request_timeout=_float_env("OLLAMA_TIMEOUT", 60.0),
     )
@@ -68,7 +69,8 @@ def load_settings(project_root: Path | None = None) -> Settings:
 
 def _float_env(name: str, default: float) -> float:
     try:
-        return float(os.getenv(name, str(default)))
+        value = float(os.getenv(name, str(default)))
+        return value if math.isfinite(value) and value > 0 else default
     except ValueError:
         return default
 

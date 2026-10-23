@@ -30,6 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
         default="01,02,03",
         help="要执行的步骤，逗号分隔。可选: 01,02,03。默认全部执行。",
     )
+    parser.add_argument("--doctor", action="store_true", help="检测 Ollama 地址、模型和实际对话，不抓取行情。")
     parser.add_argument("--date", help="目标日期，格式 YYYYMMDD。默认使用今天并自动回退交易日。")
     parser.add_argument("--top-sectors", type=int, default=5, help="输出热门板块数量。")
     parser.add_argument("--top-stocks", type=int, default=3, help="每个板块输出个股数量。")
@@ -47,6 +48,19 @@ def run(argv: list[str] | None = None) -> int:
         return 2
 
     settings = load_settings()
+    if args.doctor:
+        from .llm.client import LLMUnavailable, OllamaClient
+
+        client = OllamaClient(settings)
+        print(f"Ollama: {client.base_url}; 模型: {client.model}; 超时: {client.timeout}s")
+        try:
+            client.check()
+            client.chat("请用中文回答：连接成功。")
+        except LLMUnavailable as exc:
+            print(f"自检失败：{exc}", file=sys.stderr)
+            return 1
+        print("自检成功：模型存在，/api/chat 返回有效正文。")
+        return 0
     ensure_output_dirs(settings)
 
     market_brief = None
